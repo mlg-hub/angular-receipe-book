@@ -1,22 +1,35 @@
 <div class="row">
   <div class="col-xs-12">
-    <form action="" id="shopping-list-add">
+    <form action="" id="shopping-list-add" (ngSubmit)="onSubmit(f.value)" #f="ngForm">
       <div class="row">
         <div class="col-sm-5 form-group">
           <label for="item-name">Name</label>
-          <input type="text" id="item-name" required class="form-control">
+          <input type="text"
+                 id="item-name"
+                 required
+                 [ngModel] = "item.nameI"
+                 name="nameI"
+                 class="form-control">
         </div>
 
         <div class="col-sm-2 form-group">
           <label for="item-amount">Name</label>
-          <input type="text" id="item-amount" required class="form-control">
+          <input type="text"
+                 id="item-amount"
+                 required
+                 [ngModel]="item.amountI"
+                 name="amountI"
+                 class="form-control">
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <button class="btn btn-success" type="submit"> Add item</button>
-          <button class="btn btn-danger" type="button">Delete item</button>
-          <button class="btn btn-primary" type="button">Clear</button>
+          <button class="btn btn-success" type="submit" *ngIf="isAdd" [disabled]="!f.valid">Add item</button>
+          <div *ngIf="!isAdd">
+          <button class="btn btn-success" type="submit" [disabled]="!f.valid"> Save</button>
+          <button class="btn btn-danger" type="button" (click)="onDelete()">Delete item</button>
+          <button class="btn btn-primary" type="button" (click)="onClear()">Clear</button>
+          </div>
         </div>
       </div>
     </form>
