@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import {RecipeService} from "../recipe.service";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute,Router } from "@angular/router";
 import {FormArray, FormGroup, FormControl, Validators, FormBuilder } from "@angular/forms";
 import {Subscription} from "rxjs/Subscription";
 import {Recipe} from "../recipe";
@@ -18,7 +18,8 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
   private recipe: Recipe;
   constructor(private route: ActivatedRoute,
               private recipeService: RecipeService,
-              private formBuilder: FormBuilder ) { }
+              private formBuilder: FormBuilder,
+              private router: Router) { }
 
   ngOnInit() {
     this.subscription = this.route.params.subscribe(
@@ -40,6 +41,37 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
   ngOnDestroy(){
     this.subscription.unsubscribe();
   }
+    private navigateBack(){
+        this.router.navigate(['../']);
+    }
+
+    onSubmit(){
+        const newRecipe = this.recipeForm.value;
+        if(this.isNew){
+            this.recipeService.addRecipe(newRecipe);
+        }else{
+            this.recipeService.editRecipe(this.recipe, newRecipe);
+        }
+        //console.log(newRecipe.ingredients);
+        this.navigateBack();
+    }
+    onAddItem(name: string, amount: number){
+        (<FormArray>this.recipeForm.controls['ingredients']).push(
+            new FormGroup({
+                nameI: new FormControl(name, Validators.required),
+                amountI:new FormControl(amount, [
+                    Validators.required,
+                    Validators.pattern("\\d+")
+                ])
+            })
+        )
+    }
+    onRemoveItem(index: number){
+        (<FormArray>this.recipeForm.controls['ingredients']).removeAt(index);
+    }
+    onCancel() {
+        this.navigateBack();
+    }
 
   private initForm(){
     let recipeName= '';
@@ -48,16 +80,18 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
     let recipeIngredients: FormArray = new FormArray([]);
 
     if(!this.isNew){
-        for( let i = 0; i < this.recipe.ingredients.length; i++){
-          recipeIngredients.push(
-              new FormGroup({
-                name: new FormControl(this.recipe.ingredients[i].nameI, Validators.required),
-                amount:new FormControl(this.recipe.ingredients[i].amountI, [
-                  Validators.required,
-                  Validators.pattern("\\d+")
-                ])
-              })
-          )
+        if(this.recipe.hasOwnProperty('ingredients')){
+            for( let i = 0; i < this.recipe.ingredients.length; i++){
+                recipeIngredients.push(
+                    new FormGroup({
+                        nameI: new FormControl(this.recipe.ingredients[i].nameI, Validators.required),
+                        amountI:new FormControl(this.recipe.ingredients[i].amountI, [
+                            Validators.required,
+                            Validators.pattern("\\d+")
+                        ])
+                    })
+                )
+            }
         }
       recipeName = this.recipe.name;
       recipeImageUrl = this.recipe.imagePath;
