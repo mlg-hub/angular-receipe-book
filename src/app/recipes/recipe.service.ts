@@ -1,8 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { Headers, Http, Response } from '@angular/http';
 import 'rxjs/add/operator/map';
-import {Recipe} from "./recipe";
-import {Ingredient} from "../shared/ingredient";
+import {Recipe} from './recipe';
+import {Ingredient} from '../shared/ingredient';
 
 
 @Injectable()
@@ -43,11 +43,11 @@ export class RecipeService {
   storeData() {
     const body = JSON.stringify(this.recipes);
     const headers = new Headers({
-        'Content-Type':'application/json'
+        'Content-Type': 'application/json'
     });
      return this.http.put('', body, {headers: headers});
   }
-  fetchData(){
+  fetchData() {
       return this.http.get('') //get from firebase
           .map((response: Response) => response.json())
           .subscribe(
